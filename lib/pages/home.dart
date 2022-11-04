@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_crud/pages/add_user.dart';
+import 'package:flutter_crud/pages/edit_user.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -56,7 +57,11 @@ class _HomeState extends State<Home> {
                 Row(
                   children: [
                     IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => EdittUser()));
+                          
+                        },
                         icon: Icon(
                           Icons.edit,
                           color: Colors.blue,

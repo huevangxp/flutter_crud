@@ -10,18 +10,8 @@ class AddUser extends StatefulWidget {
 class _AddUserState extends State<AddUser> {
   String Gender = "";
 
-  //  String dropdownvalue = 'Item 1';
   final userType = ['Admin', 'User'];
-  // String ChooseType = "Ch";
 
-  // List of items in our dropdown menu
-  // var items = [
-  //   'Item 1',
-  //   'Item 2',
-  //   'Item 3',
-  //   'Item 4',
-  //   'Item 5',
-  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -75,30 +65,46 @@ class _AddUserState extends State<AddUser> {
               const SizedBox(
                 height: 20,
               ),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.9,
-                child: DropdownButton(
-                    isExpanded: true,
-                    hint: const Text("Select"),
-                    items: userType
-                        .map((e) => DropdownMenuItem(
-                              child: Text(
-                                e,
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              value: e,
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      setState(() {
-                      });
-                    }),
+              selectWidget(context),
+              const SizedBox(
+                height: 100,
               ),
+              buttonAddUser(context)
             ],
           ),
         ),
       ),
     );
+  }
+
+  Container buttonAddUser(BuildContext context) {
+    return Container(
+              width: MediaQuery.of(context).size.width * 0.4,
+              height: 40,
+              child: ElevatedButton(onPressed: (){}, child: Text('Add User', style:TextStyle(fontSize: 20))));
+  }
+
+  Container selectWidget(BuildContext context) {
+    return Container(
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: DropdownButton(
+                  isExpanded: true,
+                  hint: Text("Select"),
+                  items: userType
+                      .map((e) => DropdownMenuItem(
+                            child: Text(
+                              e,
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            value:e,
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      value = value;
+                    });
+                  }),
+            );
   }
 
   Container textFormFieldPhone(BuildContext context) {
