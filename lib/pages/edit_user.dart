@@ -9,9 +9,9 @@ class EdittUser extends StatefulWidget {
 
 class _EdittUserState extends State<EdittUser> {
   String Gender = "";
+  String SelectUserType = "Select User Type";
 
   final userType = ['Admin', 'User'];
-
 
   @override
   Widget build(BuildContext context) {
@@ -79,32 +79,40 @@ class _EdittUserState extends State<EdittUser> {
 
   Container buttonAddUser(BuildContext context) {
     return Container(
-              width: MediaQuery.of(context).size.width * 0.4,
-              height: 40,
-              child: ElevatedButton(onPressed: (){}, child: Text('Edit User', style:TextStyle(fontSize: 20))));
+        width: MediaQuery.of(context).size.width * 0.4,
+        height: 40,
+        child: ElevatedButton(
+            onPressed: () {},
+            child: Text('Edit User', style: TextStyle(fontSize: 20))));
   }
 
   Container selectWidget(BuildContext context) {
     return Container(
-              width: MediaQuery.of(context).size.width * 0.9,
-              child: DropdownButton(
-                  isExpanded: true,
-                  hint: Text("Select"),
-                  items: userType
-                      .map((e) => DropdownMenuItem(
-                            child: Text(
-                              e,
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            value:e,
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      value = value;
-                    });
-                  }),
-            );
+      width: MediaQuery.of(context).size.width * 0.9,
+      child: DropdownButton(
+          isExpanded: true,
+          hint: SelectUserType == null
+              ? Text(SelectUserType)
+              : Text(
+                  SelectUserType,
+                  style: TextStyle(color: Colors.black),
+                ),
+          items: userType
+              .map((e) => DropdownMenuItem(
+                    child: Text(
+                      e,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    value: e,
+                  ))
+              .toList(),
+          onChanged: (value) {
+            setState(() {
+              // value = value;
+              SelectUserType = value!;
+            });
+          }),
+    );
   }
 
   Container textFormFieldPhone(BuildContext context) {
@@ -209,4 +217,3 @@ class _EdittUserState extends State<EdittUser> {
     );
   }
 }
-

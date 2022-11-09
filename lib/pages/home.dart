@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_crud/pages/add_user.dart';
 import 'package:flutter_crud/pages/edit_user.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -10,6 +11,16 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  int _currentIndex = 0;
+
+  final screens = [
+    const Center(child: AddUser()),
+    const Center(child:  Text("huevang"),),
+    const Center(child:  Text("huevang"),),
+    const Center(child:  Text("huevang"),),
+    const Center(child:  Text("huevang"),),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,9 +28,50 @@ class _HomeState extends State<Home> {
         title: Text("Home"),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        itemCount: 20,
-        itemBuilder: (context, index) => Column(
+      // bottomNavigationBar: GNav(
+      //   backgroundColor: Colors.blue,
+      //   color: Colors.white,
+      //   activeColor: Colors.white,
+      //   gap: 8,
+      //   selectedIndex: _currentIndex,
+      //   onTabChange: (index) => {setState(() => _currentIndex = index)},
+      //   tabs: const [
+      //     GButton(
+      //       icon: Icons.home,
+      //       text: 'Home',
+      //     ),
+      //     GButton(
+      //       icon: Icons.link,
+      //       text: 'Link',
+      //     ),
+      //     GButton(
+      //       icon: Icons.search,
+      //       text: 'Search',
+      //     ),
+      //     GButton(
+      //       icon: Icons.heart_broken,
+      //       text: 'Heart',
+      //     )
+      //   ],
+      // ),
+      // body: screens[_currentIndex],
+      body:listView(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddUser()),
+          );
+        },
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+
+  ListView listView() {
+    return ListView.builder(
+      itemCount: 20,
+      itemBuilder: (context, index) => Column(
         children: [
           Container(
             padding: EdgeInsets.all(10),
@@ -43,12 +95,18 @@ class _HomeState extends State<Home> {
                           Text(
                             "Mr Huevang XiongPor",
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontFamily: "NotoSerifLao",fontWeight: FontWeight.w800,fontSize: 20),
+                            style: TextStyle(
+                                fontFamily: "NotoSerifLao",
+                                fontWeight: FontWeight.w800,
+                                fontSize: 20),
                           ),
                           SizedBox(
                             height: 4,
                           ),
-                          Text("020 23456543", style: TextStyle(fontSize: 16),),
+                          Text(
+                            "020 23456543",
+                            style: TextStyle(fontSize: 16),
+                          ),
                         ],
                       ),
                     ),
@@ -58,9 +116,10 @@ class _HomeState extends State<Home> {
                   children: [
                     IconButton(
                         onPressed: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => EdittUser()));
-                          
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => EdittUser()));
                         },
                         icon: Icon(
                           Icons.edit,
@@ -68,42 +127,50 @@ class _HomeState extends State<Home> {
                         )),
                     IconButton(
                         onPressed: () {
-              showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  title: const Text("Delete This Account"),
-                  content: const Text("Do you want to delete this account?"),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(ctx).pop();
-                      },
-                      child: Container(
-                        // color: Colors.red,
-                        // padding: const EdgeInsets.all(14),
-                        // child: const Text("Delete", style: TextStyle(color: Colors.white),),
-                        child:Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            ElevatedButton(onPressed: () {
-                            Navigator.of(ctx).pop();
-                            }, child:Text("Cancel"),
-                           ),
-                           SizedBox(width: 10,),
-                            ElevatedButton(onPressed: () {
-                            Navigator.of(ctx).pop();
-                            }, child:Text("Delete"),
-                            style: ButtonStyle(
-      backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
-    ),),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text("Delete This Account"),
+                              content: const Text(
+                                  "Do you want to delete this account?"),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(ctx).pop();
+                                  },
+                                  child: Container(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.end,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(ctx).pop();
+                                          },
+                                          child: Text("Cancel"),
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(ctx).pop();
+                                          },
+                                          child: Text("Delete"),
+                                          style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all<
+                                                    Color>(Colors.red),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                         icon: Icon(Icons.delete, color: Colors.red)),
                   ],
                 )
@@ -114,17 +181,7 @@ class _HomeState extends State<Home> {
             thickness: 1,
             // color: Color.fromARGB(255, 5, 5, 5),
           )
-        
         ],
-      ),),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const AddUser()),
-          );
-        },
-        child: Icon(Icons.add),
       ),
     );
   }
