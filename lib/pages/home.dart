@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_crud/pages/add_user.dart';
 import 'package:flutter_crud/pages/edit_user.dart';
+import 'package:flutter_crud/services/user_service.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:intl/intl.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -13,15 +15,40 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _currentIndex = 0;
 
+  // DateTime selected = DateTime.now();
+  DateFormat formatter = DateFormat('dd-MM-yyyy');
+
   final screens = [
     const Center(child: AddUser()),
-    const Center(child:  Text("huevang"),),
-    const Center(child:  Text("huevang"),),
-    const Center(child:  Text("huevang"),),
-    const Center(child:  Text("huevang"),),
+    const Center(
+      child: Text("huevang"),
+    ),
+    const Center(
+      child: Text("huevang"),
+    ),
+    const Center(
+      child: Text("huevang"),
+    ),
+    const Center(
+      child: Text("huevang"),
+    ),
   ];
 
+  var userData;
+
   @override
+  void initState() {
+    super.initState();
+    getUserData();
+  }
+
+  getUserData() async {
+    var data = await UserServices().getAllUser();
+    setState(() {
+      userData = data["users"];
+    });
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -55,7 +82,11 @@ class _HomeState extends State<Home> {
       //   ],
       // ),
       // body: screens[_currentIndex],
-      body:listView(),
+      body: userData == null
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : listView(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -70,7 +101,7 @@ class _HomeState extends State<Home> {
 
   ListView listView() {
     return ListView.builder(
-      itemCount: 20,
+      itemCount: userData.length,
       itemBuilder: (context, index) => Column(
         children: [
           Container(
@@ -80,11 +111,17 @@ class _HomeState extends State<Home> {
               children: [
                 Row(
                   children: [
-                    Image.asset(
-                      "assets/images/male.jpeg",
-                      width: 60,
-                      height: 60,
-                    ),
+                    userData[index]["gender"] == "MALE"
+                        ? Image.asset(
+                            "assets/images/male.jpeg",
+                            width: 60,
+                            height: 60,
+                          )
+                        : Image.asset(
+                            "assets/images/female.jpeg",
+                            width: 60,
+                            height: 60,
+                          ),
                     SizedBox(
                       width: 12,
                     ),
@@ -92,8 +129,19 @@ class _HomeState extends State<Home> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Mr Huevang XiongPor",
+                          userData[index]['gender'] == "MALE" ? Text(
+                           "Mr " + userData[index]["fname"] +
+                                " " +
+                                userData[index]["lname"],
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontFamily: "NotoSerifLao",
+                                fontWeight: FontWeight.w800,
+                                fontSize: 20),
+                          ) : Text(
+                           "Ms " + userData[index]["fname"] +
+                                " " +
+                                userData[index]["lname"],
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                                 fontFamily: "NotoSerifLao",
@@ -104,8 +152,13 @@ class _HomeState extends State<Home> {
                             height: 4,
                           ),
                           Text(
-                            "020 23456543",
+                            userData[index]["phone"],
                             style: TextStyle(fontSize: 16),
+                          ),
+                          Text(
+                            formatter.format(
+                                DateTime.parse(userData[index]["birthday"])) + " ( " + userData[index]['role'] + " )",
+                            style: TextStyle(fontSize: 12),
                           ),
                         ],
                       ),
@@ -140,8 +193,7 @@ class _HomeState extends State<Home> {
                                   },
                                   child: Container(
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.end,
+                                      mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         ElevatedButton(
                                           onPressed: () {

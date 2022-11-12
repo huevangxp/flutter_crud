@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class EdittUser extends StatefulWidget {
   const EdittUser({super.key});
@@ -9,9 +10,45 @@ class EdittUser extends StatefulWidget {
 
 class _EdittUserState extends State<EdittUser> {
   String Gender = "";
-  String SelectUserType = "Select User Type";
+  String selectUser = 'Select Type';
+  DateTime selected = DateTime.now();
+  DateFormat formatter = DateFormat('dd-MM-yyyy');
+  TextEditingController BirthdayController = TextEditingController();
+  TextEditingController _fname = TextEditingController();
+  TextEditingController _lname = TextEditingController();
+  TextEditingController _phone = TextEditingController();
+
+  bool firstNameValidate = false;
+  bool lastNameValidate = false;
+
+  String? get _errorText {
+    final text = _phone.text;
+
+    if (text.isEmpty) {
+      return 'Can\'t be empty';
+    }
+    if (text.length < 8) {
+      return 'Too short';
+    }
+    // return null if the text is valid
+    return null;
+  }
 
   final userType = ['Admin', 'User'];
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: selected,
+        firstDate: DateTime(1900),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selected) {
+      setState(() {
+        selected = picked;
+        BirthdayController.text = formatter.format(selected);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +60,7 @@ class _EdittUserState extends State<EdittUser> {
           },
           icon: Icon(Icons.arrow_back),
         ),
-        title: Center(child: Text("Edit User")),
+        title: Center(child: Text("Add User")),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -82,8 +119,27 @@ class _EdittUserState extends State<EdittUser> {
         width: MediaQuery.of(context).size.width * 0.4,
         height: 40,
         child: ElevatedButton(
-            onPressed: () {},
-            child: Text('Edit User', style: TextStyle(fontSize: 20))));
+            onPressed: () {
+              print("first name: ${_fname.text}");
+              print("last name: ${_lname.text}");
+              print("Gender: ${Gender}");
+              print("brithday: ${BirthdayController.text}");
+              print("phone: ${_phone.text}");
+              print("select: ${selectUser}");
+
+              if (_fname.text.isEmpty && _lname.text.isEmpty) {
+                setState(() {
+                  firstNameValidate = true;
+                  lastNameValidate = true;
+                });
+              } else {
+                setState(() {
+                  firstNameValidate = false;
+                  lastNameValidate = false;
+                });
+              }
+            },
+            child: Text('Add User', style: TextStyle(fontSize: 20))));
   }
 
   Container selectWidget(BuildContext context) {
@@ -91,12 +147,8 @@ class _EdittUserState extends State<EdittUser> {
       width: MediaQuery.of(context).size.width * 0.9,
       child: DropdownButton(
           isExpanded: true,
-          hint: SelectUserType == null
-              ? Text(SelectUserType)
-              : Text(
-                  SelectUserType,
-                  style: TextStyle(color: Colors.black),
-                ),
+          hint: selectUser == null ? Text(selectUser) : Text(selectUser),
+          // value: selectUser,
           items: userType
               .map((e) => DropdownMenuItem(
                     child: Text(
@@ -108,78 +160,112 @@ class _EdittUserState extends State<EdittUser> {
               .toList(),
           onChanged: (value) {
             setState(() {
-              // value = value;
-              SelectUserType = value!;
+              selectUser = value!;
+              // print(value);
             });
           }),
     );
   }
 
-  Container textFormFieldPhone(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.9,
-      child: TextFormField(
-        decoration: InputDecoration(
-            labelText: "Phone",
-            border: OutlineInputBorder(),
-            prefixIcon: IconButton(onPressed: () {}, icon: Icon(Icons.phone))),
-      ),
+  Widget textFormFieldPhone(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: MediaQuery.of(context).size.width * 0.9,
+          child: TextFormField(
+            controller: _phone,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+                errorText: _errorText,
+                labelText: "Phone",
+                border: OutlineInputBorder(),
+                prefixIcon:
+                    IconButton(onPressed: () {}, icon: Icon(Icons.phone))),
+          ),
+        ),
+      ],
     );
   }
 
-  Container textFormFieldBirthday(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.9,
-      height: 50,
-      child: TextFormField(
-        decoration: InputDecoration(
-          labelText: "Birthday",
-          border: OutlineInputBorder(),
-          suffixIcon: IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.date_range),
+  Widget textFormFieldBirthday(BuildContext context) {
+    return InkWell(
+      onTap: () => _selectDate(context),
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: 50,
+        child: IgnorePointer(
+          child: TextFormField(
+            controller: BirthdayController,
+            decoration: InputDecoration(
+              labelText: "Birthday",
+              border: OutlineInputBorder(),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  // _selectDate(context);
+                },
+                icon: Icon(Icons.date_range),
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 
-  Container radioMaleAndFemal(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.9,
-      child: Row(
-        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Row(
+  Widget radioMaleAndFemal(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: MediaQuery.of(context).size.width * 0.9,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Radio(
-                  value: "Male",
-                  groupValue: Gender,
-                  onChanged: (value) {
-                    setState(() {
-                      Gender = value.toString();
-                      print(value);
-                    });
-                  }),
-              Text("Male"),
+              Row(
+                children: [
+                  Radio(
+                      value: "Male",
+                      groupValue: Gender,
+                      onChanged: (value) {
+                        setState(() {
+                          Gender = value.toString();
+                          print(value);
+                        });
+                      }),
+                  Text("Male"),
+                ],
+              ),
+              Row(
+                children: [
+                  Radio(
+                      value: "Female",
+                      groupValue: Gender,
+                      onChanged: (value) {
+                        setState(() {
+                          Gender = value.toString();
+                          print(value);
+                        });
+                      }),
+                  Text("Female")
+                ],
+              )
             ],
           ),
-          Row(
-            children: [
-              Radio(
-                  value: "Female",
-                  groupValue: Gender,
-                  onChanged: (value) {
-                    setState(() {
-                      Gender = value.toString();
-                      print(value);
-                    });
-                  }),
-              Text("Female")
-            ],
-          )
-        ],
-      ),
+        ),
+        Gender == ""
+            ? Container(
+                padding: EdgeInsets.only(left: 50),
+                child: Row(
+                  children: [
+                    Container(
+                        child: Text(
+                      "please select gender",
+                      style: TextStyle(color: Colors.red),
+                    )),
+                  ],
+                ),
+              )
+            : Container(),
+      ],
     );
   }
 
@@ -188,7 +274,9 @@ class _EdittUserState extends State<EdittUser> {
       width: MediaQuery.of(context).size.width * 0.9,
       height: 50,
       child: TextFormField(
+        controller: _lname,
         decoration: InputDecoration(
+          errorText: lastNameValidate ? "Please enter last name" : null,
           labelText: "Last Name",
           prefixIcon: Icon(
             Icons.person,
@@ -200,20 +288,27 @@ class _EdittUserState extends State<EdittUser> {
     );
   }
 
-  Container textFieldFname(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.9,
-      height: 50,
-      child: TextFormField(
-        decoration: InputDecoration(
-          labelText: "First Name",
-          prefixIcon: Icon(
-            Icons.person,
-            color: Colors.black,
+  Widget textFieldFname(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: 50,
+          child: TextFormField(
+            controller: _fname,
+            decoration: InputDecoration(
+              errorText: firstNameValidate ? 'Value Can\'t Be Empty' : null,
+              labelText: "First Name",
+              prefixIcon: Icon(
+                Icons.person,
+                color: Colors.black,
+              ),
+              border: OutlineInputBorder(),
+            ),
           ),
-          border: OutlineInputBorder(),
         ),
-      ),
+        // _fname.text.isEmpty ? Text("Please enter your first name", style: TextStyle(color: Colors.red),) : Container(),
+      ],
     );
   }
 }
