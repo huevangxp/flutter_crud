@@ -35,6 +35,8 @@ class _HomeState extends State<Home> {
   ];
 
   var userData;
+  var userDelete;
+  var id;
 
   @override
   void initState() {
@@ -47,6 +49,11 @@ class _HomeState extends State<Home> {
     setState(() {
       userData = data["users"];
     });
+  }
+
+  deleteUser() async {
+    // var delete = await UserServices().DeleteUser();
+    // userDelete = delete;
   }
 
   Widget build(BuildContext context) {
@@ -129,25 +136,29 @@ class _HomeState extends State<Home> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          userData[index]['gender'] == "MALE" ? Text(
-                           "Mr " + userData[index]["fname"] +
-                                " " +
-                                userData[index]["lname"],
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                fontFamily: "NotoSerifLao",
-                                fontWeight: FontWeight.w800,
-                                fontSize: 20),
-                          ) : Text(
-                           "Ms " + userData[index]["fname"] +
-                                " " +
-                                userData[index]["lname"],
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                fontFamily: "NotoSerifLao",
-                                fontWeight: FontWeight.w800,
-                                fontSize: 20),
-                          ),
+                          userData[index]['gender'] == "MALE"
+                              ? Text(
+                                  "Mr " +
+                                      userData[index]["fname"] +
+                                      " " +
+                                      userData[index]["lname"],
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontFamily: "NotoSerifLao",
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 20),
+                                )
+                              : Text(
+                                  "Ms " +
+                                      userData[index]["fname"] +
+                                      " " +
+                                      userData[index]["lname"],
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontFamily: "NotoSerifLao",
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 20),
+                                ),
                           SizedBox(
                             height: 4,
                           ),
@@ -156,8 +167,11 @@ class _HomeState extends State<Home> {
                             style: TextStyle(fontSize: 16),
                           ),
                           Text(
-                            formatter.format(
-                                DateTime.parse(userData[index]["birthday"])) + " ( " + userData[index]['role'] + " )",
+                            formatter.format(DateTime.parse(
+                                    userData[index]["birthday"])) +
+                                " ( " +
+                                userData[index]['role'] +
+                                " )",
                             style: TextStyle(fontSize: 12),
                           ),
                         ],
@@ -172,7 +186,17 @@ class _HomeState extends State<Home> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => EdittUser()));
+                                builder: (context) => EdittUser(
+                                  id: userData[index]["_id"],
+                                  fname: userData[index]['fname'],
+                                  lname: userData[index]['lname'],
+                                  gender: userData[index]['gender'],
+                                  role:  userData[index]['role'] ,
+                                  phone: userData[index]['phone'],
+                                  birthday: userData[index]['birthday'],
+                                ),
+                               
+                              ));
                         },
                         icon: Icon(
                           Icons.edit,
@@ -205,8 +229,21 @@ class _HomeState extends State<Home> {
                                           width: 10,
                                         ),
                                         ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.of(ctx).pop();
+                                          onPressed: () async {
+                                            setState(() {
+                                              id = userData[index]['_id'];
+                                            });
+                                            var delete = await UserServices()
+                                                .DeleteUser(id);
+                                            if (delete == 200) {
+                                              Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Home(),
+                                                  ),
+                                                  (route) => false);
+                                            }
                                           },
                                           child: Text("Delete"),
                                           style: ButtonStyle(

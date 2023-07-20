@@ -1,4 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_crud/pages/home.dart';
+import 'package:flutter_crud/services/user_service.dart';
 import 'package:intl/intl.dart';
 
 class AddUser extends StatefulWidget {
@@ -9,10 +13,10 @@ class AddUser extends StatefulWidget {
 }
 
 class _AddUserState extends State<AddUser> {
-  String Gender = "";
+  String gender = "MALE";
   String selectUser = 'Select Type';
   DateTime selected = DateTime.now();
-  DateFormat formatter = DateFormat('dd-MM-yyyy');
+  DateFormat formatter = DateFormat('yyyy-MM-dd');
   TextEditingController BirthdayController = TextEditingController();
   TextEditingController _fname = TextEditingController();
   TextEditingController _lname = TextEditingController();
@@ -34,7 +38,7 @@ class _AddUserState extends State<AddUser> {
     return null;
   }
 
-  final userType = ['Admin', 'User'];
+  final userType = ['ADMIN', 'USER'];
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -119,24 +123,32 @@ class _AddUserState extends State<AddUser> {
         width: MediaQuery.of(context).size.width * 0.4,
         height: 40,
         child: ElevatedButton(
-            onPressed: () {
-              print("first name: ${_fname.text}");
-              print("last name: ${_lname.text}");
-              print("Gender: ${Gender}");
-              print("brithday: ${BirthdayController.text}");
-              print("phone: ${_phone.text}");
-              print("select: ${selectUser}");
+            onPressed: () async {
+
 
               if (_fname.text.isEmpty && _lname.text.isEmpty) {
                 setState(() {
                   firstNameValidate = true;
                   lastNameValidate = true;
                 });
+                return;
               } else {
                 setState(() {
                   firstNameValidate = false;
                   lastNameValidate = false;
                 });
+              }
+              var _res = await UserServices().createNewUser({
+                "fname": _fname.text,
+                "lname": _lname.text,
+                "gender": gender,
+                "birthday": BirthdayController.text,
+                "role": selectUser,
+                "phone": _phone.text
+              });
+              if (_res == 200) {
+                Navigator.pushAndRemoveUntil(context,
+                    MaterialPageRoute(builder: (context) => Home()), (route) => false);
               }
             },
             child: Text('Add User', style: TextStyle(fontSize: 20))));
@@ -195,13 +207,12 @@ class _AddUserState extends State<AddUser> {
         height: 50,
         child: IgnorePointer(
           child: TextFormField(
-            controller: BirthdayController,
-            decoration: InputDecoration(
+              controller: BirthdayController,
+              decoration: InputDecoration(
               labelText: "Birthday",
               border: OutlineInputBorder(),
               suffixIcon: IconButton(
                 onPressed: () {
-                  // _selectDate(context);
                 },
                 icon: Icon(Icons.date_range),
               ),
@@ -223,11 +234,11 @@ class _AddUserState extends State<AddUser> {
               Row(
                 children: [
                   Radio(
-                      value: "Male",
-                      groupValue: Gender,
+                      value: "MALE",
+                      groupValue: gender,
                       onChanged: (value) {
                         setState(() {
-                          Gender = value.toString();
+                          gender = value.toString();
                           print(value);
                         });
                       }),
@@ -237,11 +248,11 @@ class _AddUserState extends State<AddUser> {
               Row(
                 children: [
                   Radio(
-                      value: "Female",
-                      groupValue: Gender,
+                      value: "FEMALE",
+                      groupValue: gender,
                       onChanged: (value) {
                         setState(() {
-                          Gender = value.toString();
+                          gender = value.toString();
                           print(value);
                         });
                       }),
@@ -251,7 +262,7 @@ class _AddUserState extends State<AddUser> {
             ],
           ),
         ),
-        Gender == ""
+        gender == ""
             ? Container(
                 padding: EdgeInsets.only(left: 50),
                 child: Row(

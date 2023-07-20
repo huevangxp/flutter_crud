@@ -1,18 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_crud/pages/home.dart';
+import 'package:flutter_crud/services/user_service.dart';
 import 'package:intl/intl.dart';
 
 class EdittUser extends StatefulWidget {
-  const EdittUser({super.key});
+  String? id;
+  String? fname;
+  String? lname;
+  String? gender;
+  String? role;
+  String? birthday;
+  String? phone;
+  EdittUser(
+      {super.key,
+      this.id,
+      this.fname,
+      this.lname,
+      this.birthday,
+      this.gender,
+      this.phone,
+      this.role});
 
   @override
   State<EdittUser> createState() => _EdittUserState();
 }
 
 class _EdittUserState extends State<EdittUser> {
-  String Gender = "";
+  String gender = "MALE";
   String selectUser = 'Select Type';
   DateTime selected = DateTime.now();
-  DateFormat formatter = DateFormat('dd-MM-yyyy');
+  DateFormat formatter = DateFormat('yyyy-MM-dd');
   TextEditingController BirthdayController = TextEditingController();
   TextEditingController _fname = TextEditingController();
   TextEditingController _lname = TextEditingController();
@@ -34,7 +51,7 @@ class _EdittUserState extends State<EdittUser> {
     return null;
   }
 
-  final userType = ['Admin', 'User'];
+  final userType = ['ADMIN', 'USER'];
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -48,6 +65,18 @@ class _EdittUserState extends State<EdittUser> {
         BirthdayController.text = formatter.format(selected);
       });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // id = widget.id;
+    gender = widget.gender!;
+    selectUser = widget.role!;
+    BirthdayController.text = formatter.format(DateTime.parse(widget.birthday!));
+    _fname.text = widget.fname!;
+    _lname.text = widget.lname!;
+    _phone.text = widget.phone!;
   }
 
   @override
@@ -83,7 +112,7 @@ class _EdittUserState extends State<EdittUser> {
                 child: Row(
                   children: [
                     Text(
-                      "Gender",
+                      "Birthday",
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                     ),
@@ -119,13 +148,13 @@ class _EdittUserState extends State<EdittUser> {
         width: MediaQuery.of(context).size.width * 0.4,
         height: 40,
         child: ElevatedButton(
-            onPressed: () {
-              print("first name: ${_fname.text}");
-              print("last name: ${_lname.text}");
-              print("Gender: ${Gender}");
-              print("brithday: ${BirthdayController.text}");
-              print("phone: ${_phone.text}");
-              print("select: ${selectUser}");
+            onPressed: () async {
+              // print("first name: ${_fname.text}");
+              // print("last name: ${_lname.text}");
+              // print("Gender: ${gender}");
+              // print("brithday: ${BirthdayController.text}");
+              // print("phone: ${_phone.text}");
+              // print("select: ${selectUser}");
 
               if (_fname.text.isEmpty && _lname.text.isEmpty) {
                 setState(() {
@@ -137,6 +166,22 @@ class _EdittUserState extends State<EdittUser> {
                   firstNameValidate = false;
                   lastNameValidate = false;
                 });
+              }
+              var update = await UserServices().updateUser(widget.id!, {
+                "fname": _fname.text,
+                "lname": _lname.text,
+                "gender": gender,
+                "birthday": BirthdayController.text,
+                "role": selectUser,
+                "phone": _phone.text
+              });
+              if (update == 200) {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Home(),
+                    ),
+                    (route) => false);
               }
             },
             child: Text('Add User', style: TextStyle(fontSize: 20))));
@@ -223,11 +268,11 @@ class _EdittUserState extends State<EdittUser> {
               Row(
                 children: [
                   Radio(
-                      value: "Male",
-                      groupValue: Gender,
+                      value: "MALE",
+                      groupValue: gender,
                       onChanged: (value) {
                         setState(() {
-                          Gender = value.toString();
+                          gender = value.toString();
                           print(value);
                         });
                       }),
@@ -237,11 +282,11 @@ class _EdittUserState extends State<EdittUser> {
               Row(
                 children: [
                   Radio(
-                      value: "Female",
-                      groupValue: Gender,
+                      value: "FEMALE",
+                      groupValue: gender,
                       onChanged: (value) {
                         setState(() {
-                          Gender = value.toString();
+                          gender = value.toString();
                           print(value);
                         });
                       }),
@@ -251,7 +296,7 @@ class _EdittUserState extends State<EdittUser> {
             ],
           ),
         ),
-        Gender == ""
+        gender == ""
             ? Container(
                 padding: EdgeInsets.only(left: 50),
                 child: Row(
